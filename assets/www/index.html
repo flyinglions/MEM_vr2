@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <!-- Adding a comment to test -->
+        <title>
+            List of all the Graphs
+        </title>
+        
+        <link rel="stylesheet" href="./theme/Wikus/WikusTheme.css" />
+        <link rel="stylesheet" href="./theme/Wikus/jquery.mobile.structure-1.1.0.min.css" />
+        <script src="./theme/Wikus/jquery-1.7.1.min.js"></script>
+        <script src="./theme/Wikus/jquery.mobile-1.1.0.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+            <script type="text/javascript" charset="utf-8" src="smsread.js"></script>
+            <script type="text/javascript" charset="utf-8" src="SMSReceiverPlugin.js"></script>
+            <script type="text/javascript" src="./javascript/Queue.compressed.js"></script>
+            <script type="text/javascript" charset="utf-8" src="common.js"></script>
+            <script type="text/javascript" charset="utf-8" src="statusbarnotification.js"></script>
+        
+        
+
+        <script type="text/javascript">
+            function redirect(val)
+            {
+                window.location = val;
+            }
+        </script>
+        <script class="code" type="text/javascript">
+
+        function startLoading(val)
+        {
+            $('div#loading').show();
+            var wait = ((Math.random()*3)+1)*1000;
+            var t = setTimeout("redirect('"+val+"/index.html')",wait);
+        }
+
+        function stopLoading()
+        {
+            $('div#loading').hide();
+        }
+
+        //startLoading();
+
+        $(document).ready(function()
+        {
+            stopLoading();
+        });
+
+        </script>		
+    
+    <script type="text/javascript" src="./javascript/inisystem.js"></script>
+    <script type="text/javascript">
+        //document.addEventListener("deviceready", onWikusDeviceReady, false);
+        
+        var db = null;
+        var functionQueue = new Queue();
+        var typeQueue = new Queue();
+        
+        var lastSql = "";
+        
+        /*function onWikusDeviceReady()
+        {
+            db = window.openDatabase("Database", "1.0", "Flying Lions Database", 10485760);
+            //alert("ready");
+            
+            //dropTables();
+            
+            createIfNotExistTables();
+            
+            checkQueue();
+        }*/
+        
+        function createIfNotExistTables()
+        {
+            functionQueue.enqueue('CREATE TABLE IF NOT EXISTS Bank_Account (Account_Num UNIQUE, Bank, Acc_Name, Balance)');
+            typeQueue.enqueue('CREATE');
+            
+            functionQueue.enqueue('CREATE TABLE IF NOT EXISTS Budget_Items (Category UNIQUE,Budget_Amount,Remaining)');
+            typeQueue.enqueue('CREATE');
+            
+            functionQueue.enqueue('CREATE TABLE IF NOT EXISTS sms (SMS_ID,Date,Time,Amount,Balance,Location,Account_Num,Category)');
+            typeQueue.enqueue('CREATE');
+            
+            functionQueue.enqueue('CREATE TABLE IF NOT EXISTS Recon (Transaction_ID,Type,Recon,Account_Num,SMS_ID)');
+            typeQueue.enqueue('CREATE');
+        }
+        
+        function dropTables()
+        {
+            functionQueue.enqueue('DROP TABLE IF EXISTS Bank_Account');
+            typeQueue.enqueue('DROP');
+            
+            functionQueue.enqueue('DROP TABLE IF EXISTS Budget_Items');
+            typeQueue.enqueue('DROP');
+            
+            functionQueue.enqueue('DROP TABLE IF EXISTS sms');
+            typeQueue.enqueue('DROP');
+            
+            functionQueue.enqueue('DROP TABLE IF EXISTS Recon');
+            typeQueue.enqueue('DROP');
+        }
+        
+        function checkQueue()
+        {
+            db.transaction(queryDB, error, success);
+        }
+        
+        function queryDB(tx)
+        {        
+            var length = functionQueue.getLength();
+
+            //alert("length of Queue:"+length);
+            for(var i=0; i < length; i++)
+            {
+
+                var type = typeQueue.dequeue();
+                var sqlVal = functionQueue.dequeue();
+                //alert(type);
+                //alert(sqlVal);
+                lastSql = sqlVal;
+                if(sqlVal != "")
+                {
+                    if(type == 'DROP')
+                    {
+                        //alert('Drop occured');
+                        tx.executeSql(sqlVal);
+                    }
+                    if(type == 'CREATE')
+                    {
+                        //alert('Create occured');
+                        tx.executeSql(sqlVal);
+                    }
+                    if(type == 'INSERT')
+                    {
+                        tx.executeSql(sqlVal);
+                        //alert(sqlVal);
+                    }
+                }
+            }
+            
+            //alert('Data loaded succesfully!');
+
+            global_trans = tx;
+        }
+        
+        // Transaction error callback
+        function error(err) 
+        {
+            console.log("Error processing SQL: "+err.code);
+            alert("Error: Last SQL : "+lastSql);
+        }
+
+        // Transaction success callback
+        function success() 
+        {
+            console.log("success on database transaction.");
+            $('h3.loading').detach();
+        }
+    </script>
+</head>
+<body onload="init()">
+		
+        <div id="loader" data-role="page" data-theme="a">
+            <div data-role="header" data-position="inline">
+                <h1>Mobile Expenditure Manager</h1>
+            </div>
+            <div data-role="content" data-theme="a" class="menu">
+                <h3 class="loading">Loading...</h3>
+                <input class="button" type="button" value="Accounts" onclick="redirect('Accounts.html');"/><br />
+                <input class="button" type="button" data-icon="gear" value="Settings" onclick="redirect('Settings.html');" disabled="disabled"/><br />
+                <input class="button" type="button" data-icon="grid" value="Reports" onclick="redirect('graphMenu.html')"/><br />
+                <!--<input class="button" type="button" value="Add Manual" onclick="redirect('addManual.html')"/><br />-->
+                <div id="loading" style="display: inline" class="ui-loader ui-corner-all ui-body-a ui-loader-verbose">
+                <span class="ui-icon ui-icon-loading"></span>
+                <h1>Loading...</h1>
+                </div>
+            </div>
+        </div>		
+    
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>
+            Account Addition
+        </title>
+        <link rel="stylesheet" href="../theme/Wikus/WikusTheme.css" />
+        <link rel="stylesheet" href="../theme/Wikus/jquery.mobile.structure-1.1.0.min.css" />
+        <script src="../theme/Wikus/jquery-1.7.1.min.js"></script>
+        <script src="../theme/Wikus/jquery.mobile-1.1.0.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="../cordova-1.9.0.js"></script>
+        <script type="text/javascript">
+            function redirect(val)
+            {
+                window.location = val;
+            }
+        </script>
+        <script class="code" type="text/javascript">
+
+        function startLoading(val)
+        {
+            $('div#loading').show();
+            var wait = ((Math.random()*3)+1)*1000;
+            var t = setTimeout("redirect('"+val+"/index.html')",wait);
+        }
+
+        function stopLoading()
+        {
+            $('div#loading').hide();
+        }
+
+        //startLoading();
+
+        $(document).ready(function()
+        {
+            stopLoading();
+        });
+
+        </script>
+        <script>
+            document.addEventListener("deviceready", onDeviceReady, false);
+
+            var Accounts = new Array();
+            var newAccounts = new Array();
+            var tmpSQL ="";
+            var db;
+
+            // Query the database
+            ///
+            function queryDB(tx) {
+                tx.executeSql('SELECT * FROM Bank_Account', [], bank_accountSuccess, errorCB);
+                //tx.executeSql('SELECT * FROM sms', [], querySuccess, errorCB);
+            }
+            
+            function bank_accountSuccess(tx, results)
+            {
+                var len = results.rows.length;
+                $('<h3>List of Accounts in use</h3>').appendTo('div.data');
+                if(len == 0)
+                {
+                    $('<h5>None</h5>').appendTo('div.data');
+                }
+                for (var i=0; i<len; i++)
+                {
+                    Accounts.push(results.rows.item(i).Account_Num);
+                    $('<h5>'+results.rows.item(i).Account_Num+':'+results.rows.item(i).Acc_Name+'</h5>').appendTo('div.data');
+                }
+                $("<input class=\"button\" type=\"button\" value=\"Back\" onclick=\"redirect('../Accounts.html');\"/>").appendTo("div.data");
+            }
+
+            // Transaction error callback
+            //
+            function errorCB(err) 
+            {
+                alert("Error processing SQL: "+err.code);
+            }
+
+
+            // Cordova is ready
+            //
+            function onDeviceReady() {
+                db = window.openDatabase("Database", "1.0", "Flying Lions Database", 10485760);
+                db.transaction(queryDB, errorCB);
+            }
+        </script>
+    </head>
+    <body>
+		<!-- Add Accounts -->
+<div data-role="page" id="page1">
+	<div data-role="content" style="padding: 15px">
+		<div class="data" data-role="fieldcontain">
+                    
+                    
+		</div>
+	</div>
+</div>
+
+
+
+
+    </body>
+</html>

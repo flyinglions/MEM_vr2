@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>
+            List of all the Graphs
+        </title>
+        <link rel="stylesheet" href="./theme/Wikus/WikusTheme.css" />
+        <link rel="stylesheet" href="./theme/Wikus/jquery.mobile.structure-1.1.0.min.css" />
+        <script src="./theme/Wikus/jquery-1.7.1.min.js"></script>
+        <script src="./theme/Wikus/jquery.mobile-1.1.0.min.js"></script>
+        <script type="text/javascript">
+            function redirect(val)
+            {
+                window.location = val;
+            }
+        </script>
+        <script class="code" type="text/javascript">
+
+        function startLoading(val)
+        {
+            $('div#loading').show();
+            var wait = ((Math.random()*3)+1)*1000;
+            var t = setTimeout("redirect('"+val+"/index.html')",wait);
+        }
+
+        function stopLoading()
+        {
+            $('div#loading').hide();
+        }
+
+        //startLoading();
+
+        $(document).ready(function()
+        {
+            stopLoading();
+        });
+
+        </script>
+    </head>
+    <body>
+        <div id="loader" data-role="page" data-theme="a">
+            <div data-role="header" data-position="inline">
+                <h1>Accounts</h1>
+            </div>
+            <div data-role="content" data-theme="a">
+                <input class="button" type="button" value="Add" onclick="redirect('Accounts/add.html');"/><br />
+                <input class="button" type="button" value="Delete" onclick="redirect('Accounts/delete.html');"/><br />
+                <input class="button" type="button" value="View" onclick="redirect('Accounts/view.html');"/><br />
+                <input class="button" type="button" value="Back" onclick="redirect('index.html');"/><br />
+                <div id="loading" style="display: inline" class="ui-loader ui-corner-all ui-body-a ui-loader-verbose">
+                <span class="ui-icon ui-icon-loading"></span>
+                <h1>Loading...</h1>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

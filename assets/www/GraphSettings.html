@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>
+            List of all the Graphs
+        </title>
+        <link rel="stylesheet" href="./theme/Wikus/WikusTheme.css" />
+        <link rel="stylesheet" href="./theme/Wikus/jquery.mobile.structure-1.1.0.min.css" />
+        <script src="./theme/Wikus/jquery-1.7.1.min.js"></script>
+        <script src="./theme/Wikus/jquery.mobile-1.1.0.min.js"></script>
+	
+	
+	<script type="text/javascript" charset="utf-8" src="cordova-1.9.0.js"></script>
+	<script type="text/javascript" charset="utf-8" src="inisystem.js"></script>
+	
+        <script type="text/javascript">
+            function redirect(val)
+            {
+                window.location = val;
+            }
+        </script>
+        <script class="code" type="text/javascript">
+
+        function startLoading(val)
+        {
+            $('div#loading').show();
+            var wait = ((Math.random()*3)+1)*1000;
+            var t = setTimeout("redirect('"+val+"/index.html')",wait);
+        }
+
+        function stopLoading()
+        {
+            $('div#loading').hide();
+        }
+
+        //startLoading();
+
+        $(document).ready(function()
+        {
+            stopLoading();
+        });
+	
+	
+	
+	
+	/*==============================*/
+	/*Accessing phonegap and inisystem*/
+	/*==============================*/
+		
+	
+	
+	
+	function onBodyLoad() {
+       
+        //Add the PhoneGap deviceready event listener
+        document.addEventListener("deviceready", onDeviceReady, false);
+      }
+
+      function onDeviceReady() {
+        //PhoneGap initialized
+	file_content = "empty";
+	console.log("ondeviceready");
+	startINI();
+	
+	//initFileSystem(); - not used here
+	
+      }
+	
+	function setMonthsForBudgetingGraph() {
+		var months = document.getElementById("slider-0").value;
+		alert(months);
+		if (INIset("budget_graph","months",months)) 
+		console.log("set success");
+		else 
+		console.log("Set failed");
+		
+		showContents();
+	}
+	
+	function onINIloaded() {
+	getMonthsForBudgetingGraph();
+	}
+	function getMonthsForBudgetingGraph() {
+		var months =  INIget("budget_graph","months");
+		if (months==null) {
+		console.log("months null");
+		document.forms['months'].elements['slider'].value = 4;		
+		}
+		else {
+		document.forms['months'].elements['slider'].value = months;		
+		}
+	}
+
+
+        </script>
+    </head>
+    <body onload ="onBodyLoad();">
+        <div id="loader" data-role="page" data-theme="a">
+            <div data-role="header" data-position="inline">
+                <h1>Settings</h1>
+            </div>
+            <div data-role="content" data-theme="a">
+                
+		<!-- slider to change span of months-->
+		<form name="months">
+		   <label for="slider-0">Input slider:</label>
+		   <input type="range" name="slider" id="slider-0" value="6" min="1" max="12"  />
+		   <input class="button" type="button" value="Set amount of months to show" onclick="setMonthsForBudgetingGraph() ;"/><br />
+		   
+		   <input class="button" type="button" value="write back" onclick="stopINI() ;"/><br />
+		    <input class="button" type="button" value="show" onclick="showContents() ;"/><br />
+		</form>
+		
+		  
+		
+            </div>
+        </div>
+    </body>
+</html>

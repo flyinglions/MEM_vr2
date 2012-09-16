@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--<meta charset="utf-8">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Expenses</title>
+    <link rel="stylesheet" href="../theme/Wikus/WikusTheme.css" />
+    <link rel="stylesheet" href="../theme/Wikus/jquery.mobile.structure-1.1.0.min.css" />
+    <script src="../theme/Wikus/jquery-1.7.1.min.js"></script>
+    <script src="../theme/Wikus/jquery.mobile-1.1.0.min.js"></script>
+    <link class="include" rel="stylesheet" type="text/css" href="../report/jquery.jqplot.min.css" />
+    <script type="text/javascript" charset="utf-8" src="../cordova-1.9.0.js"></script>
+  </head>
+  <body>
+    <div data-role="page" data-theme="a">
+      <div data-role="header" data-position="inline">
+        <h1>Expenses</h1>
+      </div>
+      <div data-role="content" data-theme="a" class="ReportContent">
+          <h3 class="loading">Loading data...</h3>
+        <script class="code" type="text/javascript">
+            document.addEventListener("deviceready", onDeviceReady, false);
+            var plot1 = new Array();
+            var accounts = new Array();
+            var acc_Num = new Array();
+            var expenses = [0,0,0,0,0,0,0,0,0,0,0,0];
+            var ticks = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            // Query the database
+            ///
+            function queryDB(tx) {
+                tx.executeSql('SELECT * FROM Bank_Account', [], bank_accountSuccess, errorCB);
+                tx.executeSql('SELECT * FROM sms', [], querySuccess, errorCB);
+            }
+            
+            function bank_accountSuccess(tx, results)
+            {
+                var len = results.rows.length;
+                //alert(len);
+                //len = 1;
+                for (var i=0; i<len; i++)
+                {
+                    //alert(results.rows.item(i).Acc_Name);
+                    accounts.push(results.rows.item(i).Acc_Name+ " " + results.rows.item(i).Bank + " : "+ results.rows.item(i).Account_Num);
+                    acc_Num.push(results.rows.item(i).Account_Num);
+                    //$("div h3").text();
+                }
+            }
+            
+            function getMonthPos(month)
+            {
+                //FORMAT YYYY/MM/DD OR YYYY-MM-DD OR YYYY*MM*DD
+                //FORMAT dd/mm/yy
+                var dateArr = month.split("/");
+                return dateArr[1];
+            }
+            
+            function sanitize(value)
+            {
+                var newValue = value;
+                
+                newValue = replaceAll(".", newValue);
+                newValue = replaceAll("/", newValue);
+                newValue = replaceAll(" ", newValue);
+                
+                return newValue;
+            }
+            
+            function replaceAll(exp, value)
+            {
+                newValue = value;
+                while(newValue.indexOf(exp) > -1)
+                {
+                    newValue = newValue.replace(exp,"_");
+                }
+                return newValue;
+            }
+
+            // Query the success callback
+            //
+            function querySuccess(tx, results) {
+                var len = results.rows.length;
+                var output = "";
+                
+                $('h3.loading').detach();
+                if(accounts.length == 0)
+                {
+                    $('<h3>No Accounts Found.</h3>').appendTo('.ReportContent');
+                }
+                for(var j = 0 ; j < accounts.length; j++)
+                {
+                    expenses = [0,0,0,0,0,0,0,0,0,0,0,0];
+                    //alert(sanitize(acc_Num[j]));
+                    
+                    $('<h3>'+accounts[j]+'</h3>').appendTo('.ReportContent');
+                    $('<div id="'+sanitize(acc_Num[j])+'" style="height:300px; width:300px;"></div>').appendTo('.ReportContent');
+                    
+                    for(var i = 0 ; i < len; i++)
+                    {
+                        //alert(results.rows.item(i).Account_Num);
+                        //alert(sanitize(results.rows.item(i).Account_Num) +":"+ sanitize(acc_Num[j]))
+                        if(sanitize(results.rows.item(i).Account_Num) == sanitize(acc_Num[j]))
+                        {
+                            if(results.rows.item(i).Amount < 0)
+                            {
+                                //alert(results.rows.item(i).Account_Num);
+                                //alert(results.rows.item(i).Amount);
+                                expenses[(1*getMonthPos(results.rows.item(i).Date))-1] = expenses[(1*getMonthPos(results.rows.item(i).Date))-1] - 1*results.rows.item(i).Amount;
+                            }
+                        }
+
+                    }
+                    plotGraph(sanitize(acc_Num[j]));
+                }
+            }
+            
+            function plotGraph(name)
+            {
+                //alert(income);
+                $.jqplot(name, [expenses], {
+                        title: 'Overview of Cash Flow',
+                        animate: true,
+                        animateReplot: true,
+                        cursor: {
+                            show: true,
+                            zoom: true,
+                            looseZoom: true,
+                            showTooltip: false
+                        },
+                        series:[
+                            {
+                            label:'expenses',
+                            color: '#FF0000',
+                            pointLabels: {
+                                //show: true
+                            },
+                            renderer: $.jqplot.BarRenderer,
+                            showHighlight: false,
+                            yaxis: 'yaxis',
+                            rendererOptions: {
+                                animation: {
+                                speed: 2500
+                                },
+                                barWidth: 15,
+                                barPadding: -15,
+                                barMargin: 0,
+                                highlightMouseOver: false
+                            }
+                            }
+                        ],
+                        axesDefaults: {
+                            pad: 0
+                        },
+                        axes: {
+                            xaxis: {
+                            label: "Month",
+                            renderer: $.jqplot.CategoryAxisRenderer,
+                            //labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                            ticks: ticks,
+                            tickOptions: {
+                                angle: 90
+                            }
+                            },
+                            yaxis: {
+                            label: "Cash Amount",
+                            tickOptions: {
+                                formatString: "R%'d"
+                            },
+                            rendererOptions: {
+                                //forceTickAt0: true
+                            }
+                            },
+                            y2axis: {
+                            tickOptions: {
+                                formatString: "R%'d"
+                            },
+                            rendererOptions: {
+                                alignTicks: true,
+                                forceTickAt0: true
+                            }
+                            }
+                        },
+                        highlighter: {
+                            show: true,
+                            showLabel: true,
+                            tooltipAxes: 'y',
+                            sizeAdjust: 7.5 , tooltipLocation : 'ne'
+                        },
+                        legend: {
+                            show: true,
+                            location: 'sw',
+                            placement: 'outside'
+                        }  
+                    });
+            }
+          
+          // Transaction error callback
+            //
+            function errorCB(err) {
+                alert("Error processing SQL: "+err.code);
+            }
+
+
+            // Cordova is ready
+            //
+            function onDeviceReady() {
+                db = window.openDatabase("Database", "1.0", "Flying Lions Database", 10485760);
+                db.transaction(queryDB, errorCB);
+            }  
+        </script>
+        
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("table.jqplot-table-legend").attr({ 
+                    style: "left: 0px; top: 220px; "
+                });
+            });
+        </script>
+
+        
+        <!-- Don't touch this! -->
+        
+        
+        <script class="include" type="text/javascript" src="../report/jquery.jqplot.min.js"></script>
+        <script type="text/javascript" src="../report/syntaxhighlighter/scripts/shCore.min.js"></script>
+        <script type="text/javascript" src="../report/syntaxhighlighter/scripts/shBrushJScript.min.js"></script>
+        <script type="text/javascript" src="../report/syntaxhighlighter/scripts/shBrushXml.min.js"></script>
+        <script type="text/javascript" src="../report/plugins/jqplot.logAxisRenderer.min.js"></script>
+        <script type="text/javascript" src="../report/plugins/jqplot.canvasTextRenderer.min.js"></script>
+        <script type="text/javascript" src="../report/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+        <script type="text/javascript" src="../report/plugins/jqplot.canvasAxisTickRenderer.min.js"></script>
+        <!-- Additional plugins go here -->
+        
+        <script class="include" type="text/javascript" src="../report/plugins/jqplot.barRenderer.min.js"></script>
+        <script type="text/javascript" src="../report/plugins/jqplot.categoryAxisRenderer.min.js"></script>
+        <script class="include" type="text/javascript" src="../report/plugins/jqplot.highlighter.min.js"></script>
+        <script class="include" type="text/javascript" src="../report/plugins/jqplot.cursor.min.js"></script>
+        <script class="include" type="text/javascript" src="../report/plugins/jqplot.pointLabels.min.js"></script>
+        
+        <!-- End additional plugins -->
+      </div>
+    </div>
+  </body>
+</html>
