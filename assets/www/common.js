@@ -32,9 +32,6 @@ function onDeviceReady()
 	
 	isFirstRun = true;
 	
-	//Any startup events
-	executeStartupEvents();
-	
 	/*read all files in MEM and delete them*/
 	getDirectoryEntries(got_direntries);
 	
@@ -44,6 +41,9 @@ function onDeviceReady()
 	//dropTables();	
 	createIfNotExistTables();
 	checkQueue();
+	
+	//Any startup events
+	executeStartupEvents();
 
 }
 
@@ -103,9 +103,15 @@ function executeStartupEvents(){
 }
 
 function notificationCallback(){
+	checkQueue();
 	if(isPhoneGapReady == false){
 		window.plugins.StatusBarNotification.notify("Decoded SMS", "New Decoded msg");
 	}
+	else
+		{
+			alert("New decoded SMS received");
+		}
+	
 	
 	
 }

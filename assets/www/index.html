@@ -50,7 +50,6 @@
     
     <script type="text/javascript" src="./javascript/inisystem.js"></script>
     <script type="text/javascript">
-        //document.addEventListener("deviceready", onWikusDeviceReady, false);
         
         var db = null;
         var functionQueue = new Queue();
@@ -58,17 +57,6 @@
         
         var lastSql = "";
         
-        /*function onWikusDeviceReady()
-        {
-            db = window.openDatabase("Database", "1.0", "Flying Lions Database", 10485760);
-            //alert("ready");
-            
-            //dropTables();
-            
-            createIfNotExistTables();
-            
-            checkQueue();
-        }*/
         
         function createIfNotExistTables()
         {
@@ -102,6 +90,7 @@
         
         function checkQueue()
         {
+        	console.log("CheckQueue");
             db.transaction(queryDB, error, success);
         }
         
@@ -156,6 +145,22 @@
             console.log("success on database transaction.");
             $('h3.loading').detach();
         }
+        
+        function importInbox() {
+        	//navigator.notification.progressStart("TITLE","MSG");
+		   window.plugins.SMSReader.getInbox("",
+			function(data){
+			      console.log("getINBOX+++++++++++Finised");
+				  checkQueue();
+ 
+			},
+			function(e){
+				console.log(e);
+			});
+			//navigator.notification.progressStop();
+
+	    }
+	    
     </script>
 </head>
 <body onload="init()">
@@ -169,7 +174,7 @@
                 <input class="button" type="button" value="Accounts" onclick="redirect('Accounts.html');"/><br />
                 <input class="button" type="button" data-icon="gear" value="Settings" onclick="redirect('Settings.html');" disabled="disabled"/><br />
                 <input class="button" type="button" data-icon="grid" value="Reports" onclick="redirect('graphMenu.html')"/><br />
-                <!--<input class="button" type="button" value="Add Manual" onclick="redirect('addManual.html')"/><br />-->
+                <input class="button" type="button" value="Import Inbox" onclick="importInbox()"/><br />
                 <div id="loading" style="display: inline" class="ui-loader ui-corner-all ui-body-a ui-loader-verbose">
                 <span class="ui-icon ui-icon-loading"></span>
                 <h1>Loading...</h1>

@@ -34,14 +34,14 @@ public class SQLGenerator {
     private String buildInsert(String[] realValue) throws FileNotFoundException, IOException {
         String SQLStatement = "INSERT INTO sms(Date,Time,Amount,Balance,Location,Account_Num,Category) values('";
         if (realValue.length == lengthCompare) {
-            SQLStatement += this.convertFromAbsa(realValue[3]) + "','" + timeStamp + "'," + realValue[5] + "," + this.getCorrectBalance(realValue[7]) + ",'" + realValue[4] + "','" + realValue[1] + "','" + this.getCategories(realValue[4]) + "')";
+            SQLStatement += this.convertFromAbsa(realValue[3]) + "','" + timeStamp + "'," + realValue[5] + "," + this.getCorrectBalance(realValue[7]) + ",'" + realValue[4] + "','" + realValue[1] + "','" + this.getCategories(realValue[4]) + "');";
         } else {
-            SQLStatement += this.getDateCorrect(realValue[15]) + "','" + timeStamp + "'," + realValue[2] + "," + this.getCorrectBalance(realValue[12]) + ",'" + realValue[6] + "','" + realValue[8] + "','" + this.getCategories(realValue[6]) + "')";
+            SQLStatement += this.getDateCorrect(realValue[15]) + "','" + timeStamp + "'," + realValue[2] + "," + this.getCorrectBalance(realValue[12]) + ",'" + realValue[6] + "','" + realValue[8] + "','" + this.getCategories(realValue[6]) + "');";
         }
 
         return SQLStatement;
     }
-    
+
     private String getCorrectBalance(String string) throws NumberFormatException, IOException {
         float currBal = Float.parseFloat(string);
         if (tempReal.length == lengthCompare) {
@@ -76,7 +76,7 @@ public class SQLGenerator {
             Account = tempReal[8];
             date = this.getDateCorrect(tempReal[15]) + ":" + timeStamp;
         }
-        SQLStatement += this.getExspensesIncome(diff) + "'," + recon + ",'" + Account + "','" + date + "')";
+        SQLStatement += this.getExspensesIncome(diff) + "'," + recon + ",'" + Account + "','" + date + "');";
         return SQLStatement;
     }
 
@@ -96,7 +96,7 @@ public class SQLGenerator {
     }
 
     private String getCategories(String Loc) throws FileNotFoundException, IOException {
-         return SMSHandler.theSorter.getCategory(Loc);
+        return SMSHandler.theSorter.getCategory(Loc);
     }
 
     private void getBanks() throws IOException {

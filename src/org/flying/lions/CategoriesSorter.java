@@ -41,15 +41,12 @@ public class CategoriesSorter {
 	    }
 
 	    public String getCategory(String location) {
-	    	if(categories == null){
-	    		return "Other";
-	    	}
 	        int size = categories.size();
 	        for (int y = 0; y < size; y++) {
-	            String catArray[] = categories.get(y).getValue().split(";");
+	            String catArray[] = categories.get(y).getValue().split(",");
 	            int catSize = catArray.length;
 	            for (int s = 0; s < catSize; s++) {
-	                if (location.contains(catArray[s])) {
+	                if (location.toLowerCase().contains(catArray[s].trim().toLowerCase())) {
 	                    return categories.get(y).getKey();
 	                }
 	            }

@@ -1,8 +1,11 @@
 package org.flying.lions;
 
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Looper;
 import android.util.Log;
 import com.phonegap.api.Plugin;
 import com.phonegap.api.PluginResult;
@@ -60,10 +63,23 @@ public class SMSReader extends Plugin {
         Cursor cur = getContentResolver().query(uriSMSURI, null, null, null,null);
         JSONArray smsList = new JSONArray();
         data.put("messages", smsList);
+        
+        
+        /*ProgressDialog progressDialog = new ProgressDialog(super.ctx.getActivity());
+        
+        progressDialog.setMessage("Importing...");
+        progressDialog.setCancelable(false);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        progressDialog.setProgress(0); // set percentage completed to 0%
+        //progressDialog.show();*/
 
+        int smsCount = cur.getCount();
+        Log.d(TAG, Integer.toString(smsCount));
+        int incVal = 100 / smsCount;
         
         while (cur.moveToNext())
         {
+        	
         	
             /*
              * HTC se settings
@@ -71,6 +87,17 @@ public class SMSReader extends Plugin {
              * sms.put("text",cur.getString(12));   
              *
             */        	
+        	
+			try
+			{
+				MultipleSmsHandler smsHand = new MultipleSmsHandler();
+		        smsHand.parseSMS(cur.getString(cur.getColumnIndex("body")) + ";" + cur.getString(cur.getColumnIndex("date")));
+		        Log.d(TAG, "SUCCESS");
+			}
+			catch(Exception ex)
+			{
+				ex.printStackTrace();
+			}
         	
         	//SOLVED: Works for both devices Samsung and HTC
         	JSONObject sms = new JSONObject();
@@ -99,9 +126,11 @@ public class SMSReader extends Plugin {
             //Log.d(TAG, "17->"+ cur.getString(17));*/
             
             
-            
+            //progressDialog.incrementProgressBy(incVal);
             smsList.put(sms);
         }
+        
+        //progressDialog.dismiss();
         
         
         /*
