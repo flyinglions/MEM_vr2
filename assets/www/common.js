@@ -32,6 +32,7 @@ function onDeviceReady()
 	
 	isFirstRun = true;
 	
+	
 	/*read all files in MEM and delete them*/
 	getDirectoryEntries(got_direntries);
 	
@@ -103,7 +104,7 @@ function executeStartupEvents(){
 }
 
 function notificationCallback(){
-	checkQueue();
+	getDirectoryEntries(got_direntries);
 	if(isPhoneGapReady == false){
 		window.plugins.StatusBarNotification.notify("Decoded SMS", "New Decoded msg");
 	}

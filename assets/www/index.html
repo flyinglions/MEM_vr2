@@ -147,19 +147,25 @@
         }
         
         function importInbox() {
-        	//navigator.notification.progressStart("TITLE","MSG");
+        	navigator.notification.progressStart("Importing Inbox","Importing...");
 		   window.plugins.SMSReader.getInbox("",
 			function(data){
 			      console.log("getINBOX+++++++++++Finised");
-				  checkQueue();
+				  getDirectoryEntries(got_direntries);
+				  navigator.notification.progressStop();
  
 			},
 			function(e){
 				console.log(e);
 			});
-			//navigator.notification.progressStop();
+			
 
 	    }
+	    
+	    function upProgress(value) 
+        {
+            navigator.notification.progressValue(value);
+        }
 	    
     </script>
 </head>

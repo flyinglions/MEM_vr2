@@ -124,7 +124,7 @@ public class SMSReceiverPlugin extends Plugin {
 				// build code to call function
 				String code =  "javascript:" + callbackFunction + "(" + sms.toString() + ");";
 				
-		 	   	Log.v(TAG + ":sendJavascript", code);
+		 	   	//Log.v(TAG + ":sendJavascript", code);
 	
 		 	   	// execute code
 		 	   	//currentPluginInstance.sendJavascript(code);

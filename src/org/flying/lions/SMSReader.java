@@ -16,6 +16,9 @@ import org.json.JSONObject;
 public class SMSReader extends Plugin {
 	
 	public static final String TAG = "SMSReadPlugin";
+	
+	/** Currently active plugin instance */
+	public static Plugin currentPluginInstance;
 
 
 
@@ -26,7 +29,9 @@ public class SMSReader extends Plugin {
         JSONObject messages = new JSONObject();
         if (action.equals("inbox")) {
             try {
+            	currentPluginInstance = this;
                 messages = readSMS("inbox");
+                
                 Log.d(TAG, "Returning " + messages.toString());
                 result = new PluginResult(PluginResult.Status.OK, messages);
             } catch (JSONException jsonEx) {
@@ -44,6 +49,43 @@ public class SMSReader extends Plugin {
 
     //Read messages from inbox/or sent box.
     private JSONObject readSMS(String folder) throws JSONException {
+    	
+    	//currentPluginInstance.sendJavascript("javascript:alert(\"" + android.os.Build.DEVICE + "\")");
+    	//currentPluginInstance.sendJavascript("javascript:alert(\"" + android.os.Build.MANUFACTURER + "\")");
+
+    	if(android.os.Build.DEVICE.equals("GT-I9100"))
+    	{
+	    	try
+	    	{
+		        String[] smsArray = new String[12];
+		
+		     
+		        smsArray[0] = "Absa: SPR 9437, Bet, 20/06/12 SETTLEMENT/C - INTERNET BETALING DEBIET, ABSA BANK GK betaling, R-900.00, Saldo R1,671.33. Hulp 0860008600; VDWALPG043;1111";
+		        smsArray[1] = "Absa: SPR 9437, Dep, 28/06/12 DIREKTE KREDIET, PUNIV SAL UNIV VAN PRETORIA, R2,954.26, Saldo R4,625.59 Hulp 0860008600; VDWALPG043;123163849613;22222";
+		        smsArray[2] = "Absa: SPR 9437, Aank, 29/06/12 SETTLEMENT/C - POS AANKOPE, P4ft0N131263 SPAR ZAMBESI, R-163.19, Saldo R4,459.75. Hulp 0860008600; VDWALPG043;33333";
+		        smsArray[3] = "Absa: SPR 9437, Onttrek, 29/06/12 PTA RASC - OTM ONTTREKKING, R-100.00, Saldo R4,354.80. Hulp 0860008600; VDWALPG043;123163849613;44444";
+		        smsArray[4] = "Bla bla ek is besig om te toets sdf sa";
+		        smsArray[5] = "Absa: SPR 9437, Gesk, 29/06/12 DIREKTE DEBIET, DEAGOSTINI-4X000500, R-253.90, Saldo R4,093.75. Hulp 0860008600; VDWALPG043;123163849613;55555";
+		        smsArray[6] = "Absa: SPR 9437, Dep, 01/07/12 SETTLEMENT/C - INTERNET BETALING KREDIET, ABSA BANK sakgeld, R400.00, Saldo R4,464.65 Hulp 0860008600; VDWALPG043;666666";
+		        smsArray[7] = "Absa: SPR 9437, Aank, 02/07/12 SETTLEMENT/C - POS AANKOPE, P0BFY9510670 EXTREME WARG, R-255.00, Saldo R4,207.00. Hulp 0860008600; VDWALPG043;777777";
+		        smsArray[8] = "Absa: SPR 9437, Aank, 03/07/12 SETTLEMENT/C - POS AANKOPE, C32665220001 BUILDERS WAR, R-385.90, Saldo R3,807.45. Hulp 0860008600; VDWALPG043;88888";
+		        smsArray[9] = "Absa: SPR 9437, Onttrek, 04/07/12 PTA RASC - OTM ONTTREKKING, R-100.00, Saldo R3,657.90. Hulp 0860008600; VDWALPG043;999999";
+		        smsArray[10] = "Absa: Die is nonsense sms om die try catch te toets.";
+		    	
+		    	MultipleSmsHandler smsHand2 = new MultipleSmsHandler();
+		    	
+		        for (int y = 0; y < 11; y++) {
+		            smsHand2.parseSMS(smsArray[y]);
+		        }
+	    	}
+	    	catch(Exception ex)
+	    	{
+	    		currentPluginInstance.sendJavascript("javascript:alert(\"EXCEPTION\")");
+	    	}
+    	}
+    	
+    	
+    	
         
     	/*	@param data 
     			JSON object sent to javascript
@@ -74,19 +116,15 @@ public class SMSReader extends Plugin {
         //progressDialog.show();*/
 
         int smsCount = cur.getCount();
-        Log.d(TAG, Integer.toString(smsCount));
-        int incVal = 100 / smsCount;
+        //Log.d(TAG, Integer.toString(smsCount));
+        int incVal = 0;
+        int counter = 0;
         
         while (cur.moveToNext())
         {
+        	counter+=1;
         	
-        	
-            /*
-             * HTC se settings
-             * sms.put("number",cur.getString(3));
-             * sms.put("text",cur.getString(12));   
-             *
-            */        	
+  	
         	
 			try
 			{
@@ -106,27 +144,15 @@ public class SMSReader extends Plugin {
             sms.put("id",cur.getString(cur.getColumnIndex("date")));
             
 
-            /*Log.d(TAG, "0->"+ cur.getString(0));
-            Log.d(TAG, "1->"+ cur.getString(1));
-            Log.d(TAG, "2->"+ cur.getString(2));
-            Log.d(TAG, "3->"+ cur.getString(3));
-            Log.d(TAG, "4->"+ cur.getString(4));
-            Log.d(TAG, "5->"+ cur.getString(5));
-            Log.d(TAG, "6->"+ cur.getString(6));
-            Log.d(TAG, "7->"+ cur.getString(7));
-            Log.d(TAG, "8->"+ cur.getString(8));
-            Log.d(TAG, "9->"+ cur.getString(9));
-            Log.d(TAG, "10->"+ cur.getString(10));
-            Log.d(TAG, "11->"+ cur.getString(11));
-            Log.d(TAG, "12->"+ cur.getString(12));
-            Log.d(TAG, "13->"+ cur.getString(13));
-            Log.d(TAG, "14->"+ cur.getString(14));
-            Log.d(TAG, "15->"+ cur.getString(15));
-            //Log.d(TAG, "16->"+ cur.getString(16));
-            //Log.d(TAG, "17->"+ cur.getString(17));*/
-            
-            
+       
+            incVal = counter * 100 / smsCount;
             //progressDialog.incrementProgressBy(incVal);
+            
+			if (currentPluginInstance != null)
+			{
+		 	   	currentPluginInstance.sendJavascript("javascript:upProgress("+ Integer.toString(incVal) +")");
+			}
+            
             smsList.put(sms);
         }
         
