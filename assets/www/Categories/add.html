@@ -40,15 +40,15 @@
         <script>
             document.addEventListener("deviceready", onDeviceReady, false);
 
-            var Accounts = new Array();
-            var newAccounts = new Array();
+            var Categories = new Array();
+            var newCategories = new Array();
             var tmpSQL ="";
             var db;
 
             // Query the database
             ///
             function queryDB(tx) {
-                tx.executeSql('SELECT * FROM Bank_Account', [], bank_accountSuccess, errorCB);
+                tx.executeSql('SELECT * FROM Budget_Items', [], categSuccess, errorCB);
                 tx.executeSql('SELECT * FROM sms', [], querySuccess, errorCB);
             }
             
@@ -57,10 +57,9 @@
                 //tmpSQL = "INSERT INTO Bank_Account (Account_Num, Bank, Acc_Name, Balance) VALUES ('SPR 1000','ABSA','Petrus van Der walt',0)";
                 //alert(tmpSQL);
                 tx.executeSql(tmpSQL);
-                alert("Account added successfully!");
+                alert("Category added successfully!");
                 $('select#selectmenu2').val("");
-                $('#bank').val("");
-                $('#acc_name').val("");
+                $('#budget').val("");
             }
             
             function updateSuccess()
@@ -73,12 +72,12 @@
                 alert("Error processing SQL: "+err.code+" : "+tmpSQL);
             }
             
-            function bank_accountSuccess(tx, results)
+            function categSuccess(tx, results)
             {
                 var len = results.rows.length;
                 for (var i=0; i<len; i++)
                 {
-                    Accounts.push(results.rows.item(i).Account_Num);
+                    Categories.push(results.rows.item(i).Category);
                 }
             }
 
@@ -90,28 +89,29 @@
                 
                 for (var i=0; i<len; i++)
                 {
-                    var accNum = results.rows.item(i).Account_Num;
+                    var cat = results.rows.item(i).Category;
+                    //alert(cat);
                     var isNew = true;
-                    for(var j = 0 ; j < Accounts.length; j++)
+                    for(var j = 0 ; j < Categories.length; j++)
                     {
-                        var tmp = Accounts[j];
-                        if(tmp.toUpperCase() == accNum.toUpperCase())
+                        var tmp = Categories[j];
+                        if(tmp.toUpperCase() == cat.toUpperCase())
                         {
                             isNew = false;
                         }
                     }
-                    for(var j = 0 ; j < newAccounts.length; j++)
+                    for(var j = 0 ; j < newCategories.length; j++)
                     {
-                        var tmp = newAccounts[j];
-                        if(tmp.toUpperCase() == accNum.toUpperCase())
+                        var tmp = newCategories[j];
+                        if(tmp.toUpperCase() == cat.toUpperCase())
                         {
                             isNew = false;
                         }
                     }
                     if(isNew)
                     {
-                        newAccounts.push(accNum);
-                        $("#selectmenu2").append('<option name="'+sanitize(accNum)+'" value="'+accNum+'">'+accNum+'</option>');
+                        newCategories.push(cat);
+                        $("#selectmenu2").append('<option name="'+sanitize(cat)+'" value="'+cat+'">'+cat+'</option>');
                     }
                 }
             }
@@ -134,9 +134,9 @@
             
             function startup()
             {
-                $('input.update').click(function()
+                $('input.add').click(function()
                 {
-                    updateAccounts();
+                    updateCategories();
                 });
             }
             
@@ -161,27 +161,26 @@
                 return newValue;
             }
 
-            function addAccount(tmpAcc_Num, tmpBank, tmpAcc_Name)
+            function addCategory(tmpCategory, tmpBudget)
             {
-                tmpSQL = "INSERT INTO Bank_Account (Account_Num, Bank, Acc_Name) VALUES ('"+tmpAcc_Num+"','"+tmpBank+"','"+tmpAcc_Name+"')";
-                $('option[name="'+sanitize(tmpAcc_Num)+'"]').detach();
+                tmpSQL = "INSERT INTO Budget_Items (Category, Budget_Amount) VALUES ('"+tmpCategory+"','"+tmpBudget+"')";
+                $('option[name="'+sanitize(tmpCategory)+'"]').detach();
                 db = window.openDatabase("Database", "1.0", "Flying Lions Database", 10485760);
                 //$('option[name='+tmpAcc_Num).remove();
                 db.transaction(updateDB, errorCB);
             }
 			
-            function updateAccounts() {
-                    var account_num = $('select#selectmenu2').val();
-                    if (account_num.length==0) {
-                    alert("No account selected");
+            function updateCategories() {
+                    var category = $('select#selectmenu2').val();
+                    if (category.length==0) {
+                    alert("No category selected");
                     return;
                     }
 
-                    var acc_name = $('input#acc_name').val();
-                    var bank =  $('input#bank').val();
+                    var budget = $('input#budget').val();
 
                     //alert("accnum"+account_num+"\nacc_name:"+acc_name+"\nbank:"+bank);
-                    addAccount(account_num,bank,acc_name);
+                    addCategory(category,budget);
             }
             
         </script>
@@ -201,21 +200,13 @@
 		<div data-role="fieldcontain">
 			<fieldset data-role="controlgroup">
 				<label for="textinput1">
-					Bank
+					Budget Amount
 				</label>
-				<input name="" id="bank" placeholder="" value="" type="text">
+				<input name="" id="budget" placeholder="" value="0" type="text">
 			</fieldset>
 		</div>
-		<div data-role="fieldcontain">
-			<fieldset data-role="controlgroup">
-				<label for="textinput2">
-					Account Name
-				</label>
-				<input id="acc_name" placeholder="" value="" type="text">
-			</fieldset>
-		</div>
-		<input class="update" value="Update" type="submit"><br />
-                <input class="button" type="button" value="Back" onclick="redirect('../Accounts.html');"/><br />
+		<input class="add" value="Add" type="submit"><br />
+                <input class="button" type="button" value="Back" onclick="redirect('../Categories.html');"/><br />
 	</div>
 </div>
 

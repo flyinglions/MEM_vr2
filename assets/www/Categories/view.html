@@ -40,32 +40,32 @@
         <script>
             document.addEventListener("deviceready", onDeviceReady, false);
 
-            var Accounts = new Array();
-            var newAccounts = new Array();
+            var Categories = new Array();
+            var newCategories = new Array();
             var tmpSQL ="";
             var db;
 
             // Query the database
             ///
             function queryDB(tx) {
-                tx.executeSql('SELECT * FROM Bank_Account', [], bank_accountSuccess, errorCB);
+                tx.executeSql('SELECT * FROM Budget_Items', [], categorySuccess, errorCB);
                 //tx.executeSql('SELECT * FROM sms', [], querySuccess, errorCB);
             }
             
-            function bank_accountSuccess(tx, results)
+            function categorySuccess(tx, results)
             {
                 var len = results.rows.length;
-                $('<h3>List of Accounts in use</h3>').appendTo('div.data');
+                $('<h3>List of Categories in use</h3>').appendTo('div.data');
                 if(len == 0)
                 {
                     $('<h5>None</h5>').appendTo('div.data');
                 }
                 for (var i=0; i<len; i++)
                 {
-                    Accounts.push(results.rows.item(i).Account_Num);
-                    $('<h5>'+results.rows.item(i).Account_Num+':'+results.rows.item(i).Acc_Name+'</h5>').appendTo('div.data');
+                    Categories.push(results.rows.item(i).Category);
+                    $('<h5>'+results.rows.item(i).Category+': R'+results.rows.item(i).Budget_Amount+'</h5>').appendTo('div.data');
                 }
-                $("<input class=\"button\" type=\"button\" value=\"Back\" onclick=\"redirect('../Accounts.html');\"/>").appendTo("div.data");
+                $("<input class=\"button\" type=\"button\" value=\"Back\" onclick=\"redirect('../Categories.html');\"/>").appendTo("div.data");
             }
 
             // Transaction error callback
