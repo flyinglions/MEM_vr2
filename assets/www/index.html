@@ -121,8 +121,8 @@
                     }
                     if(type == 'INSERT')
                     {
-                        tx.executeSql(sqlVal, [], insertSuccess(tx, results), insertError(tx, error));
-                        alert(sqlVal);
+                        //alert(sqlVal);
+                        tx.executeSql(sqlVal);
                     }
                 }
             }
@@ -132,27 +132,19 @@
             global_trans = tx;
         }
         
-        function insertSuccess(tx, results)
-        {
-            alert('insert success');
-        }
-        
-        function insertError(tx, error)
-        {
-            alert("error");
-        }
-        
         // Transaction error callback
         function error(err) 
         {
             console.log("Error processing SQL: "+err.code);
-            alert("Error: Last SQL : "+lastSql);
+            alert("Error processing SQL: "+err.message);
+            //alert("Error: Last SQL : "+lastSql);
         }
 
         // Transaction success callback
         function success() 
         {
             console.log("success on database transaction.");
+            alert("success on database transaction.");
             $('h3.loading').detach();
         }
         
