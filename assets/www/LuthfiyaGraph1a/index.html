@@ -31,6 +31,7 @@
             ///
             function queryDB(tx) {
                 tx.executeSql('SELECT * FROM Bank_Account', [], bank_accountSuccess, errorCB);
+                tx.executeSql('SELECT * FROM Budget_Items', [], budgetSuccess, errorCB);
                 tx.executeSql('SELECT * FROM sms', [], querySuccess, errorCB);
             }
             
@@ -81,6 +82,19 @@
                 }
                 return -1;
             }
+            
+            function budgetSuccess(tx, results) {
+                var len = results.rows.length;
+                //alert(len);
+                //len = 1;
+                for (var i=0; i<len; i++)
+                {
+                    //alert(results.rows.item(i).Acc_Name);
+                    Categories.push(results.rows.item(i).Category);
+                    Budgeted.push(1*results.rows.item(i).Budget_Amount);
+                    //$("div h3").text();
+                }
+            }
 
             // Query the success callback
             //
@@ -94,6 +108,7 @@
                     $('<h3>No Accounts Found.</h3>').appendTo('.ReportContent');
                 }
                 
+                /*
                 for (var i=0; i<len; i++)
                 {
                     var tmpCategory = results.rows.item(i).Category;
@@ -112,6 +127,7 @@
                         Categories.push(tmpCategory);
                     }
                 }
+                */
                 
                 for(var k = 0 ; k < accounts.length; k++)
                 {
@@ -119,7 +135,7 @@
                     $('<div id="'+sanitize(acc_Num[k])+'" style="height:300px; width:300px;"></div>').appendTo('.ReportContent');
                     
                     Spent = new Array();
-                    Budgeted = new Array();
+                    //Budgeted = new Array();
                     
                     for(var j=0; j < Categories.length; j++)
                     {
@@ -161,90 +177,92 @@
             function plotGraph(name)
             {
                 //alert(income);
-                $.jqplot(name, [Spent], {
-                        title: 'Expenses per Category',
-                        animate: true,
-                        animateReplot: true,
-                        cursor: {
-                            show: true,
-                            zoom: true,
-                            looseZoom: true,
-                            showTooltip: false
+                $.jqplot(name, [Spent, Budgeted], {
+                    title: 'Overview of Cash Flow',
+                    animate: true,
+                    animateReplot: true,
+                    cursor: {
+                        show: true,
+                        zoom: true,
+                        looseZoom: true,
+                        showTooltip: false
+                    },
+                    series:[
+                        {
+                        label:'Spent',
+                        color: '#FF0000',
+                        pointLabels: {
+                            //show: true
                         },
-                        series:[
-                            {
-                            label:'Spent',
-                            color: '#FF0000',
-                            pointLabels: {
-                                //show: true
+                        renderer: $.jqplot.BarRenderer,
+                        showHighlight: false,
+                        yaxis: 'yaxis',
+                        rendererOptions: {
+                            animation: {
+                            speed: 2500
                             },
-                            renderer: $.jqplot.BarRenderer,
-                            showHighlight: false,
-                            yaxis: 'yaxis',
-                            rendererOptions: {
-                                animation: {
-                                speed: 2500
-                                },
-                                barWidth: 15,
-                                barPadding: -15,
-                                barMargin: 0,
-                                highlightMouseOver: false
-                            }
-                            },
-                            {
-                            label:'Budgeted',
-                            color: '#00AA00',
-                            rendererOptions: {
-                                animation: {
-                                speed: 2000
-                                }
-                            }
-                            }
-                        ],
-                        axesDefaults: {
-                            pad: 0
+                            barWidth: 15,
+                            barPadding: 0,
+                            barMargin: 0,
+                            highlightMouseOver: false
+                        }
                         },
-                        axes: {
-                            xaxis: {
-                            label: "Month",
-                            renderer: $.jqplot.CategoryAxisRenderer,
-                            //labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
-                            tickRenderer: $.jqplot.CanvasAxisTickRenderer,
-                            ticks: Categories,
-                            tickOptions: {
-                                angle: 90
-                            }
+                        {
+                        label:'Budgeted',
+                        color: '#00AA00',
+                        renderer:$.jqplot.BarRenderer,
+                        rendererOptions: {
+                            animation: {
+                            speed: 2000
                             },
-                            yaxis: {
-                            label: "Cash Amount",
-                            tickOptions: {
-                                formatString: "R%'d"
-                            },
-                            rendererOptions: {
-                                //forceTickAt0: true
-                            }
-                            },
-                            y2axis: {
-                            tickOptions: {
-                                formatString: "R%'d"
-                            },
-                            rendererOptions: {
-                                alignTicks: true,
-                                forceTickAt0: true
-                            }
-                            }
+                            barWidth: 15
+                        }
+                        }
+                    ],
+                    axesDefaults: {
+                        pad: 0
+                    },
+                    axes: {
+                        xaxis: {
+                        label: "Category",
+                        renderer: $.jqplot.CategoryAxisRenderer,
+                        labelRenderer: $.jqplot.CanvasAxisLabelRenderer,
+                        tickRenderer: $.jqplot.CanvasAxisTickRenderer,
+                        ticks: Categories,
+                        tickOptions: {
+                            angle: 90
+                        }
                         },
-                        highlighter: {
-                            show: true,
-                            showLabel: true,
-                            tooltipAxes: 'y',
-                            sizeAdjust: 7.5 , tooltipLocation : 'ne'
+                        yaxis: {
+                        label: "Cash Amount",
+                        tickOptions: {
+                            formatString: "R%'d"
                         },
-                        legend: {
-                            show: true,
-                            location: 'sw',
-                            placement: 'outside'
-                        }  
+                        rendererOptions: {
+                            //forceTickAt0: true
+                        }
+                        },
+                        y2axis: {
+                        tickOptions: {
+                            formatString: "R%'d"
+                        },
+                        rendererOptions: {
+                            alignTicks: true
+                            //forceTickAt0: true
+                        }
+                        }
+                    },
+                    highlighter: {
+                        show: true,
+                        showLabel: true,
+                        tooltipAxes: 'y',
+                        sizeAdjust: 7.5 , tooltipLocation : 'ne'
+                    },
+                    legend: {
+                        show: true,
+                        location: 'sw',
+                        placement: 'outside'
+                    }  
                     });
             }
           
