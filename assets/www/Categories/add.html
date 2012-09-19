@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title>
+            Account Addition
+        </title>
+        <link rel="stylesheet" href="../theme/Wikus/WikusTheme.css" />
+        <link rel="stylesheet" href="../theme/Wikus/jquery.mobile.structure-1.1.0.min.css" />
+        <script src="../theme/Wikus/jquery-1.7.1.min.js"></script>
+        <script src="../theme/Wikus/jquery.mobile-1.1.0.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="../cordova-1.9.0.js"></script>
+        <script type="text/javascript">
+            function redirect(val)
+            {
+                window.location = val;
+            }
+        </script>
+        <script class="code" type="text/javascript">
+
+        function startLoading(val)
+        {
+            $('div#loading').show();
+            var wait = ((Math.random()*3)+1)*1000;
+            var t = setTimeout("redirect('"+val+"/index.html')",wait);
+        }
+
+        function stopLoading()
+        {
+            $('div#loading').hide();
+        }
+
+        //startLoading();
+
+        $(document).ready(function()
+        {
+            stopLoading();
+        });
+
+        </script>
+        <script>
+            document.addEventListener("deviceready", onDeviceReady, false);
+
+            var Categories = new Array();
+            var newCategories = new Array();
+            var tmpSQL ="";
+            var db;
+
+            // Query the database
+            ///
+            function queryDB(tx) {
+                tx.executeSql('SELECT * FROM Budget_Items', [], categSuccess, errorCB);
+                tx.executeSql('SELECT * FROM sms', [], querySuccess, errorCB);
+            }
+            
+            function updateDB(tx) 
+            {
+                //tmpSQL = "INSERT INTO Bank_Account (Account_Num, Bank, Acc_Name, Balance) VALUES ('SPR 1000','ABSA','Petrus van Der walt',0)";
+                //alert(tmpSQL);
+                tx.executeSql(tmpSQL);
+                alert("Category added successfully!");
+                $('select#selectmenu2').val("");
+                $('#budget').val("");
+            }
+            
+            function updateSuccess()
+            {
+                //alert('Insert Success');
+            }
+            
+            function errorInsert(err) 
+            {
+                alert("Error processing SQL: "+err.code+" : "+tmpSQL);
+            }
+            
+            function categSuccess(tx, results)
+            {
+                var len = results.rows.length;
+                for (var i=0; i<len; i++)
+                {
+                    Categories.push(results.rows.item(i).Category);
+                }
+            }
+
+            // Query the success callback
+            //
+            function querySuccess(tx, results) {
+                var len = results.rows.length;
+                //alert(len);
+                
+                for (var i=0; i<len; i++)
+                {
+                    var cat = results.rows.item(i).Category;
+                    //alert(cat);
+                    var isNew = true;
+                    for(var j = 0 ; j < Categories.length; j++)
+                    {
+                        var tmp = Categories[j];
+                        if(tmp.toUpperCase() == cat.toUpperCase())
+                        {
+                            isNew = false;
+                        }
+                    }
+                    for(var j = 0 ; j < newCategories.length; j++)
+                    {
+                        var tmp = newCategories[j];
+                        if(tmp.toUpperCase() == cat.toUpperCase())
+                        {
+                            isNew = false;
+                        }
+                    }
+                    if(isNew)
+                    {
+                        newCategories.push(cat);
+                        $("#selectmenu2").append('<option name="'+sanitize(cat)+'" value="'+cat+'">'+cat+'</option>');
+                    }
+                }
+            }
+
+            // Transaction error callback
+            //
+            function errorCB(err) 
+            {
+                alert("Error processing SQL: "+err.code+" : "+tmpSQL);
+            }
+
+
+            // Cordova is ready
+            //
+            function onDeviceReady() {
+                db = window.openDatabase("Database", "1.0", "Flying Lions Database", 10485760);
+                db.transaction(queryDB, errorCB, updateSuccess);
+                startup();
+            }
+            
+            function startup()
+            {
+                $('input.add').click(function()
+                {
+                    updateCategories();
+                });
+            }
+            
+            function replaceAll(exp, value)
+            {
+                var newValue = value;
+                while(newValue.indexOf(exp) > -1)
+                {
+                    newValue = newValue.replace(exp,"_");
+                }
+                return newValue;
+            }
+            
+            function sanitize(value)
+            {
+                var newValue = value;
+                
+                newValue = replaceAll(".", newValue);
+                newValue = replaceAll("/", newValue);
+                newValue = replaceAll(" ", newValue);
+                
+                return newValue;
+            }
+
+            function addCategory(tmpCategory, tmpBudget)
+            {
+                tmpSQL = "INSERT INTO Budget_Items (Category, Budget_Amount) VALUES ('"+tmpCategory+"','"+tmpBudget+"')";
+                $('option[name="'+sanitize(tmpCategory)+'"]').detach();
+                db = window.openDatabase("Database", "1.0", "Flying Lions Database", 10485760);
+                //$('option[name='+tmpAcc_Num).remove();
+                db.transaction(updateDB, errorCB);
+            }
+			
+            function updateCategories() {
+                    var category = $('select#selectmenu2').val();
+                    if (category.length==0) {
+                    alert("No category selected");
+                    return;
+                    }
+
+                    var budget = $('input#budget').val();
+
+                    //alert("accnum"+account_num+"\nacc_name:"+acc_name+"\nbank:"+bank);
+                    addCategory(category,budget);
+            }
+            
+        </script>
+    </head>
+    <body>
+		<!-- Add Accounts -->
+<div data-role="page" id="page1">
+	<div data-role="content" style="padding: 15px">
+		<div data-role="fieldcontain">
+			<label for="selectmenu2">
+				Choose:
+			</label>
+			<select name="selectmenu2" id="selectmenu2">
+				
+			</select>
+		</div>
+		<div data-role="fieldcontain">
+			<fieldset data-role="controlgroup">
+				<label for="textinput1">
+					Budget Amount
+				</label>
+				<input name="" id="budget" placeholder="" value="0" type="text">
+			</fieldset>
+		</div>
+		<input class="add" value="Add" type="submit"><br />
+                <input class="button" type="button" value="Back" onclick="redirect('../Categories.html');"/><br />
+	</div>
+</div>
+
+
+
+
+    </body>
+</html>
