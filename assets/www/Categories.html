@@ -2,7 +2,7 @@
 <html>
     <head>
         <title>
-            List of all the Graphs
+            Categories
         </title>
         <link rel="stylesheet" href="./theme/Wikus/WikusTheme.css" />
         <link rel="stylesheet" href="./theme/Wikus/jquery.mobile.structure-1.1.0.min.css" />
@@ -40,12 +40,12 @@
     <body>
         <div id="loader" data-role="page" data-theme="a">
             <div data-role="header" data-position="inline">
-                <h1>Settings</h1>
+                <h1>Categories</h1>
             </div>
             <div data-role="content" data-theme="a">
-                <input class="button" type="button" value="Categories" onclick="redirect('Categories.html');"/><br />
-                <input class="button" type="button" value="Graphs" onclick="redirect('GraphSettings.html');"/><br />
-                <input class="button" type="button" value="Budgetting" onclick=""/><br />
+                <input class="button" type="button" value="Add" onclick="redirect('Categories/add.html');"/><br />
+                <input class="button" type="button" value="Delete" onclick="redirect('Categories/delete.html');"/><br />
+                <input class="button" type="button" value="View" onclick="redirect('Categories/view.html');"/><br />
                 <input class="button" type="button" value="Back" onclick="redirect('index.html');"/><br />
                 <div id="loading" style="display: inline" class="ui-loader ui-corner-all ui-body-a ui-loader-verbose">
                 <span class="ui-icon ui-icon-loading"></span>
